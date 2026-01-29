@@ -6,7 +6,7 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import Image from "next/image";
 import EnquiryForm from "../../../components/EnquiryForm";
-import { siteConfig } from "../../../lib/siteConfig";
+import { getSiteSettings, SiteSettings } from "../../../lib/settingsHelper";
 
 type Project = {
   title: string;
@@ -16,32 +16,59 @@ type Project = {
   image: string;
 };
 
+const DEFAULT_SETTINGS: SiteSettings = {
+  name: "Designer Name",
+  tagline: "Freelance Graphic Designer",
+  description: "I design clean, modern brands and digital experiences.",
+  email: "designer@email.com",
+  phone: "+91 9876543210",
+  location: "City, Country",
+  logo: "/logo.jpg",
+  domain: "https://yourdomain.com",
+  socials: {
+    instagram: "",
+    behance: "",
+    linkedin: "",
+    twitter: "",
+  },
+};
+
 export default function ProjectPage() {
   const params = useParams();
   const slug = params?.slug as string | undefined;
 
   const [project, setProject] = useState<Project | null>(null);
+  const [settings, setSettings] = useState<SiteSettings>(DEFAULT_SETTINGS);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!slug) return;
 
-    const fetchProject = async () => {
-      const q = query(
-        collection(db, "designs"),
-        where("slug", "==", slug)
-      );
+    const fetchData = async () => {
+      try {
+        const q = query(
+          collection(db, "designs"),
+          where("slug", "==", slug)
+        );
 
-      const snap = await getDocs(q);
+        const snap = await getDocs(q);
 
-      if (!snap.empty) {
-        setProject(snap.docs[0].data() as Project);
+        if (!snap.empty) {
+          setProject(snap.docs[0].data() as Project);
+        }
+
+        // Fetch settings
+        const siteSettings = await getSiteSettings();
+        setSettings(siteSettings);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setSettings(DEFAULT_SETTINGS);
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     };
 
-    fetchProject();
+    fetchData();
   }, [slug]);
 
   if (loading) return <div className="p-10 text-center">Loading project...</div>;
@@ -53,7 +80,7 @@ export default function ProjectPage() {
       {/* Project header */}
       <h1 className="text-4xl font-bold mb-2">{project.title}</h1>
       <p className="text-sm text-gray-500 mb-6">
-        by {siteConfig.name} · {project.category}
+        by {settings.name} · {project.category}
       </p>
 
       {/* Image */}
@@ -75,7 +102,7 @@ export default function ProjectPage() {
 
       {/* Footer branding */}
       <div className="mt-12 text-sm text-gray-500 text-center">
-        © {new Date().getFullYear()} {siteConfig.name} · {siteConfig.location}
+        © {new Date().getFullYear()} {settings.name} · {settings.location}
       </div>
 
     </main>
