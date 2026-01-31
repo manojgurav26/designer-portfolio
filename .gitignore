@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Service account key (do NOT commit)
 serviceAccountKey.json
+
+.vercel
+.env*.local

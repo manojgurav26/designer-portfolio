@@ -115,7 +115,7 @@ export default function HomePage() {
 
           {/* CTA Buttons */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }} className="flex gap-4 justify-center flex-wrap mt-10">
-            <button onClick={() => document.getElementById("work").scrollIntoView({ behavior: "smooth" })} className="group px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-lg transition-all duration-300 shadow-lg hover:shadow-2xl hover:scale-105 flex items-center gap-2">
+            <button onClick={() => document.getElementById("work")?.scrollIntoView({ behavior: "smooth" })} className="group px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold rounded-lg transition-all duration-300 shadow-lg hover:shadow-2xl hover:scale-105 flex items-center gap-2">
               View My Work
               <span className="group-hover:translate-x-1 transition-transform">→</span>
             </button>
