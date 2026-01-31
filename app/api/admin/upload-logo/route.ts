@@ -10,10 +10,19 @@ function initializeAdmin() {
   if (adminApp) return adminApp;
 
   try {
-    // Read service account key from file system
-    const keyPath = join(process.cwd(), 'serviceAccountKey.json');
-    const serviceAccountJson = readFileSync(keyPath, 'utf8');
-    const serviceAccount = JSON.parse(serviceAccountJson);
+    let serviceAccount: any;
+
+    // Try to read from environment variable first (Vercel)
+    if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+      serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+      console.log('Firebase service account loaded from environment variable');
+    } else {
+      // Fall back to file system for local development
+      const keyPath = join(process.cwd(), 'serviceAccountKey.json');
+      const serviceAccountJson = readFileSync(keyPath, 'utf8');
+      serviceAccount = JSON.parse(serviceAccountJson);
+      console.log('Firebase service account loaded from local file');
+    }
 
     adminApp = admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
